@@ -17,6 +17,7 @@ our @EXPORT = qw(
     requireBumpPrivileges
     requireCancelBuildPrivileges
     requireEvalJobsetPrivileges
+    readFlash
     trim
     normalizeExternalLink
     getLatestFinishedEval getFirstEval
@@ -44,6 +45,18 @@ sub logoutToken {
     my $sid = $c->sessionid;
     return undef unless defined $sid;
     return sha256_hex($sid . ":logout");
+}
+
+
+# Read the flash message for this request, if the client actually has a
+# session. `$c->flash` on its own allocates a session id and, at finalize,
+# stores it, which would create a row per bot or health-check request.
+# Anonymous clients have nothing to read, so they get an empty flash.
+# Writers (`$c->flash->{...} = ...`) are unaffected and still create sessions.
+sub readFlash {
+    my ($c) = @_;
+    return {} unless $c->sessionid && $c->session_is_valid;
+    return $c->flash;
 }
 
 
@@ -182,7 +195,9 @@ sub backToReferer {
 
 sub forceLogin {
     my ($c) = @_;
-    $c->session->{referer} = $c->request->uri;
+    # A string, because the session is stored as JSON: a URI object would
+    # not be representable, and the encoder refuses to guess.
+    $c->session->{referer} = $c->request->uri->as_string;
     accessDenied($c, "This page requires you to sign in.");
 }
 

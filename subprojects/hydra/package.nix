@@ -66,7 +66,6 @@ let
         CatalystPluginCache
         CatalystPluginPrometheusTiny
         CatalystPluginSessionStateCookie
-        CatalystPluginSessionStoreFastMmap
         CatalystPluginStackTrace
         CatalystTraitForRequestProxyBase
         CatalystViewDownload

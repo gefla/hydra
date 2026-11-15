@@ -682,6 +682,22 @@ create trigger NrBuildsFinished after insert or update or delete on Builds
   execute procedure modifyNrBuildsFinished();
 
 
+-- Web sessions, shared with every other Hydra web component.
+--
+-- The row contract (id derivation, data shape, expiry) is specified in the
+-- session-storage spec shipped with Hydra, originally added by the
+-- shared-sessions change: openspec/specs/session-storage/spec.md.
+-- In short: `id` is the hex SHA-256 of the session cookie value (never the
+-- cookie value itself), `data` is the Catalyst session hash as a JSON object,
+-- and `expires` is an epoch-seconds deadline, 0 meaning "not yet recorded".
+create table Sessions (
+    id       text   primary key not null,        -- hex SHA-256 of the cookie value
+    data     jsonb,                              -- Catalyst session hash; null until written
+    expires  bigint not null default 0           -- epoch seconds; 0 = not yet recorded
+);
+create index IndexSessionsOnExpires on Sessions(expires);
+
+
 -- Some indices.
 
 create index IndexBuildInputsOnBuild on BuildInputs(build);

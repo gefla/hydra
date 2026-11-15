@@ -73,8 +73,9 @@ sub begin :Private {
     $c->stash->{curTime} = time;
     $c->stash->{logo} = defined $c->config->{hydra_logo} ? "/logo" : "";
     $c->stash->{tracker} = defined $c->config->{tracker} ? $c->config->{tracker} : "";
-    $c->stash->{flashMsg} = $c->flash->{flashMsg};
-    $c->stash->{successMsg} = $c->flash->{successMsg};
+    my $flash = readFlash($c);
+    $c->stash->{flashMsg} = $flash->{flashMsg};
+    $c->stash->{successMsg} = $flash->{successMsg};
     $c->stash->{localStore} = isLocalStore;
     $c->stash->{logoutToken} = logoutToken($c) if $c->user_exists;
 
@@ -157,7 +158,7 @@ sub queue :Local :Args(0) :ActionClass('REST') { }
 sub queue_GET {
     my ($self, $c) = @_;
     $c->stash->{template} = 'queue.tt';
-    $c->stash->{flashMsg} //= $c->flash->{buildMsg};
+    $c->stash->{flashMsg} //= readFlash($c)->{buildMsg};
     $self->status_ok(
         $c,
         entity => [$c->model('DB::Builds')->search(

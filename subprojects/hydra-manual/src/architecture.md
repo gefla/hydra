@@ -48,6 +48,12 @@ These components all share a single Nix store and PostgreSQL database on the mas
     - input plugins extend the evaluator with new source types (Git, Mercurial, Darcs, etc.)
     - notification plugins react to build lifecycle events
 
+### Sessions
+
+Web sessions live in the `Sessions` table of the PostgreSQL database.
+They are not kept in a file or in a per-process store, so that every web component sharing the database recognises the same signed-in users.
+`hydra-server` writes them today, and any other component that reads or writes sessions must follow the `session-storage` spec (`openspec/specs/session-storage/spec.md`) for the row format: the `id` is the SHA-256 digest of the session cookie value (never the cookie value itself), `data` is the Catalyst session hash as a JSON object, and `expires` is an epoch-seconds deadline.
+
 ### Destination store
 
 The queue runner uploads built outputs to a *destination store*, which is separate from the coordinator's local Nix store.

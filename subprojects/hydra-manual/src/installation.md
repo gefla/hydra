@@ -103,6 +103,15 @@ If you're upgrading Hydra from a previous version, you should do the following t
 hydra-init
 ```
 
+This version moves web sessions out of the `www/session_data` file in Hydra's
+state directory and into a `Sessions` table in the database, which
+`hydra-init` creates. Existing sessions are not migrated, so every signed-in
+user is signed out once and has to sign in again. The `www/session_data` file
+is no longer read or written, and can be deleted once the new version is
+running. See the `session-storage` spec
+(`openspec/specs/session-storage/spec.md`) for the row format, which other
+Hydra components that share the database follow too.
+
 Getting Started
 ---------------
 

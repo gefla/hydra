@@ -9,13 +9,16 @@ use Hydra::Model::DB;
 use Hydra::Config qw(getLDAPConfigAmbient signinMethods);
 use Hydra::Helper::OIDC qw(resolveOIDCConfig);
 use Catalyst::Runtime '5.70';
+# `+Hydra::Session::Store::DB` is listed before Catalyst's Session plugin:
+# plugins are applied in the order listed, and the store wraps
+# `Session::create_session_id` to purge expired rows.
 use Catalyst qw/ConfigLoader
                 Static::Simple
                 StackTrace
                 Authentication
                 Authorization::Roles
+                +Hydra::Session::Store::DB
                 Session
-                Session::Store::FastMmap
                 Session::State::Cookie
                 Captcha
                 Cache
@@ -65,8 +68,6 @@ __PACKAGE__->config(
     },
     'Plugin::Session' => {
         expires => 3600 * 24 * 7,
-        storage => Hydra::Model::DB::getHydraPath . "/www/session_data",
-        unlink_on_exit => 0
     },
     'Plugin::Cache' => {
         backend => {

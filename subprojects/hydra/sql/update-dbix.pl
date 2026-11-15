@@ -40,6 +40,7 @@ make_schema_at("Hydra::Schema", {
         "projects" => "Projects",
         "runcommandlogs" => "RunCommandLogs",
         "schemaversion" => "SchemaVersion",
+        "sessions" => "Sessions",
         "starredjobs" => "StarredJobs",
         "systemstatus" => "SystemStatus",
         "taskretries" => "TaskRetries",
